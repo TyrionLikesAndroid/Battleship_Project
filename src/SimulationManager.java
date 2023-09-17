@@ -37,11 +37,25 @@ public class SimulationManager {
             // Create the array for our results for this iteration
             iterationGames = new HashMap<String, BattleGrid>();
 
-            // Create the ships and the battle grid and give it to the placment strategy
-            // to beging ship placement
-            pStrat.placeShips(createShips(), createBattleGrid());
+            // Create the ships and give them to the battle grid for the ship layout
+            // that we will use for this iteration with all the different strategies
+            BattleGrid gameGrid = createBattleGrid();
+            pStrat.placeShips(createShips(), gameGrid);
 
-            // SMJ - Do the attack loop
+            // Do the attack loop
+            Iterator<AttackStrategy> aIter = aStrats.iterator();
+            while(aIter.hasNext())
+            {
+                // Clone the battle grid since we need a fresh one for each strategy
+                BattleGrid gridClone = gameGrid.clone();
+
+                // Attack with the current strategy
+                AttackStrategy aStrat = aIter.next();
+                aStrat.attack(gridClone);
+
+                // Record the results and move on to the next strategy
+                iterationGames.put(aStrat.getName(), gridClone);
+            }
 
             // Add this iteration game map into the master game map
             totalGames.put(i, iterationGames);
@@ -66,11 +80,6 @@ public class SimulationManager {
         ships.add(ship);
         ship = ShipFactory.createShip(ShipFactory.CARRIER);
         ships.add(ship);
-
-        while(! ships.isEmpty()) {
-            ship = ships.remove();
-            System.out.println("Ship Created " + ship.name + ":" + ship.length);
-        }
 
         return ships;
     }
