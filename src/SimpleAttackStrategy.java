@@ -8,12 +8,13 @@ import java.util.*;
 public class SimpleAttackStrategy extends AttackStrategy {
 
     public SimpleAttackStrategy(String name) {
-        this.name = name;
+
+        super.AttackStrategy(name);
     }
 
     public void attack(BattleGrid aGrid) {
 
-        System.out.println("Attacking using strategy:" + this.name);
+        System.out.println("Attacking using strategy:" + getName());
 
         int xValue = 1;
         int yValue = 1;
