@@ -7,6 +7,8 @@ import java.util.*;
  */
 public class SimplePlacementStrategy extends PlacementStrategy {
     public SimplePlacementStrategy() {
+
+        super.PlacementStrategy();
     }
 
     public Boolean placeShips(PriorityQueue<Ship> ships, BattleGrid aGrid)

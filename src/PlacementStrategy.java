@@ -9,7 +9,7 @@ public abstract class PlacementStrategy {
     /**
      * Default constructor
      */
-    public PlacementStrategy() {
+    public void PlacementStrategy() {
     }
 
     public abstract Boolean placeShips(PriorityQueue<Ship> ships, BattleGrid aGrid);
