@@ -24,10 +24,13 @@ public class BattleGrid {
             if((a.x == b.x) && (a.y == b.y))
                 return 0;
 
-            if((a.x < b.x) || (a.y < b.y))
-                return -1;
-            else
-                return 1;
+            if(a.x == b.x)
+                return (a.y < b.y) ? -1 : 1;
+
+            if(a.y == b.y)
+                return (a.x < b.x) ? -1 : 1;
+
+            return (a.x < b.x) ? -1 : 1;
         }
     }
 

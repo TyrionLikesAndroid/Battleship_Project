@@ -22,6 +22,7 @@ public class SimpleAttackStrategy extends AttackStrategy {
         int yMax = aGrid.length;
 
         // Simple strategy to guess horizontally in consecutive order by row
+        System.out.println("STARTING SEARCH STRATEGY");
         for(; yValue <= yMax; yValue++)
         {
             for(; xValue <= xMax; xValue++)
@@ -32,7 +33,7 @@ public class SimpleAttackStrategy extends AttackStrategy {
                 {
                     // Transition to the sink algorithm, which will sink the ship and
                     // then we can resume the search algorithm
-                    //System.out.println("Moving to sink strategy");
+                    System.out.println("STARTING SINK STRATEGY");
                     shootToSink(aGrid, attackPoint, result.hitShipName);
 
                     // Once the ship is sunk, check game over condition
@@ -41,6 +42,7 @@ public class SimpleAttackStrategy extends AttackStrategy {
                         System.out.println("Game over in " + aGrid.shotHistory.size() + " total shots");
                         break;
                     }
+                    System.out.println("RESUMING SEARCH STRATEGY");
                 }
             }
 
@@ -56,35 +58,15 @@ public class SimpleAttackStrategy extends AttackStrategy {
 
     void shootToSink(BattleGrid aGrid, Point firstHit, String targetShip)
     {
-        // The sink strategy works with the following priorities:
-        // 1) Determine ship alignment first
-        // 2) Shoot at the most valuable open space on that alignment
-        // 3) Keep shooting on the proper alignment until sunk
+        // The sink strategy works as follows:
+        // 1) Try to determine ship alignment first (horizontal vs vertical)
+        // 2) Start shooting along that alignment
 
-        // The tree is used so we can automatically determine which direction is best
-        // because the keys will be sorted based on distance
-        TreeMap<Integer, String> evalMap = new TreeMap<>();
+        // Determine the best direction to shoot based on available space
+        String bestDirection = determineBestDirection(aGrid,firstHit);
 
-        // Evaluate the battle grid spacing and determine the most promising direction
-        int rightCheck = aGrid.findOpenSpaces(firstHit, BattleGrid.RIGHT);
-        evalMap.put(rightCheck,"RIGHT");
-        int leftCheck = aGrid.findOpenSpaces(firstHit, BattleGrid.LEFT);
-        evalMap.put(leftCheck,"LEFT");
-        int upCheck = aGrid.findOpenSpaces(firstHit, BattleGrid.UP);
-        evalMap.put(upCheck,"UP");
-        int downCheck = aGrid.findOpenSpaces(firstHit, BattleGrid.DOWN);
-        evalMap.put(downCheck,"DOWN");
-
-        //System.out.println("Open up=" + upCheck + " Open down=" + downCheck + " Open left=" + leftCheck +
-        //        " Open right=" + rightCheck);
-
-        // Get the last map entry, which is the direction with the most distance.  If there is a tie
-        // the last one in the list will be the winner, which is fine for now.  We will use this to
-        // determine the new attack point
-        Map.Entry<Integer,String> mostDistance = evalMap.lastEntry();
-
-        // Start the final attack loop
-        finishTargetShip(aGrid, firstHit, firstHit, targetShip, mostDistance.getValue());
+        // Start shooting in that direction
+        finishTargetShip(aGrid, firstHit, firstHit, targetShip, bestDirection);
     }
 
     void finishTargetShip(BattleGrid aGrid, Point currentHit, Point firstHit, String targetShip, String orientation) {
@@ -110,16 +92,9 @@ public class SimpleAttackStrategy extends AttackStrategy {
             }
         }
 
-        // We missed it, so try the other direction along our orientation
-        String newOrientation = null;
-        if (orientation.equals(BattleGrid.LEFT))
-            newOrientation = BattleGrid.RIGHT;
-        else if (orientation.equals(BattleGrid.RIGHT))
-            newOrientation = BattleGrid.LEFT;
-        else if (orientation.equals(BattleGrid.UP))
-            newOrientation = BattleGrid.DOWN;
-        else if (orientation.equals(BattleGrid.DOWN))
-            newOrientation = BattleGrid.UP;
+        // Our original orientation was wrong if we got here, so calculate another orientation
+        // and try again
+        String newOrientation = determineBestDirection(aGrid, firstHit);
 
         // This should always succeed because we will have gone in both directions until it's sunk. Note
         // we had to go back to the first hit because we are changing direction
@@ -139,5 +114,30 @@ public class SimpleAttackStrategy extends AttackStrategy {
             newAttack.y++;
 
         return newAttack;
+    }
+
+    String determineBestDirection(BattleGrid aGrid, Point aPoint)
+    {
+        // The tree is used so we can automatically determine which direction is best
+        // because the keys will be sorted based on distance
+        TreeMap<Integer, String> evalMap = new TreeMap<>();
+
+        // Evaluate the battle grid spacing and determine the most promising direction
+        int rightCheck = aGrid.findOpenSpaces(aPoint, BattleGrid.RIGHT);
+        evalMap.put(rightCheck,"RIGHT");
+        int leftCheck = aGrid.findOpenSpaces(aPoint, BattleGrid.LEFT);
+        evalMap.put(leftCheck,"LEFT");
+        int upCheck = aGrid.findOpenSpaces(aPoint, BattleGrid.UP);
+        evalMap.put(upCheck,"UP");
+        int downCheck = aGrid.findOpenSpaces(aPoint, BattleGrid.DOWN);
+        evalMap.put(downCheck,"DOWN");
+
+        System.out.println("Open up=" + upCheck + " Open down=" + downCheck + " Open left=" + leftCheck +
+                " Open right=" + rightCheck);
+
+        // Get the last map entry, which is the direction with the most distance.  If there is a tie
+        // the last one in the list will be the winner, which is fine for now.  We will use this to
+        // determine the new attack point
+        return evalMap.lastEntry().getValue();
     }
 }
