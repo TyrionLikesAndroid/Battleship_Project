@@ -59,9 +59,13 @@ public class Ship {
             {
                 recordHit(aPoint);
                 out = true;
+
+                System.out.println("Hit: X=" + aPoint.x + ",Y=" + aPoint.y + ",Ship=" + this.getName() + ",status=" + this.getStatus());
+
                 break;
             }
         }
+
         return out;
     }
 

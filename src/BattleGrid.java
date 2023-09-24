@@ -10,13 +10,33 @@ public class BattleGrid {
     public Integer length;
     public Integer width;
     public LinkedList<Point> shotHistory;
+    public TreeSet<Point> quickShotLookup;
     public LinkedList<Ship> myShips;
+    public static String LEFT = new String("LEFT");
+    public static String RIGHT = new String("RIGHT");
+    public static String UP = new String("UP");
+    public static String DOWN = new String("DOWN");
+
+    class PointCompare implements Comparator<Point> {
+
+        public int compare(Point a, Point b)
+        {
+            if((a.x == b.x) && (a.y == b.y))
+                return 0;
+
+            if((a.x < b.x) || (a.y < b.y))
+                return -1;
+            else
+                return 1;
+        }
+    }
 
     public BattleGrid(int length, int width) {
         this.length = length;
         this.width = width;
         this.myShips = new LinkedList<Ship>();
         this.shotHistory = new LinkedList<Point>();
+        this.quickShotLookup = new TreeSet<Point>(new PointCompare());
     }
 
     public BattleGrid clone()
@@ -41,6 +61,14 @@ public class BattleGrid {
     public ShotResult attemptShot(Point aPoint) {
 
         ShotResult out = new ShotResult(false,"","");
+
+        // See if the shot is duplicate, which is possible if it was made by a different
+        // attack strategy (search strategy versus sink strategy).  If it's duplicate,
+        // just treat it as a miss.  It has already been recorded, so no need to run
+        // through the attack code
+        if(quickShotLookup.contains(aPoint))
+            return out;
+
         Iterator<Ship> shipIterator = myShips.iterator();
         while(shipIterator.hasNext())
         {
@@ -51,6 +79,13 @@ public class BattleGrid {
                 break;
             }
         }
+
+        if(! out.isHit)
+            System.out.println("Miss X=" + aPoint.x + ",Y=" + aPoint.y);
+
+        //Make a record of the attack shot
+        recordShot(aPoint);
+
         return out;
     }
 
@@ -70,6 +105,58 @@ public class BattleGrid {
         return out;
     }
 
+    public int findOpenSpaces(Point aPoint, String direction) {
+
+        // This algorithm returns how many open/unhit spaces there are in a given direction
+        // up to the boundary
+        int out = 0;
+        int yValue = aPoint.y;
+        int xValue = aPoint.x;
+
+        if(direction.equals(LEFT))
+        {
+            for (int i = aPoint.x - 1; i > 0; i--)
+            {
+                if(! quickShotLookup.contains(new Point(i, yValue)))
+                    out++;
+                else
+                    break;
+            }
+        }
+        else if(direction.equals(RIGHT))
+        {
+            for (int i = aPoint.x + 1; i <= width; i++)
+            {
+                if(! quickShotLookup.contains(new Point(i, yValue)))
+                    out++;
+                else
+                    break;
+            }
+        }
+        else if(direction.equals(UP))
+        {
+            for (int i = aPoint.y - 1; i > 0; i--)
+            {
+                if(! quickShotLookup.contains(new Point(xValue, i)))
+                    out++;
+                else
+                    break;
+            }
+        }
+        else if(direction.equals(DOWN))
+        {
+            for (int i = aPoint.y + 1; i <= length; i++)
+            {
+                if(! quickShotLookup.contains(new Point(xValue, i)))
+                    out++;
+                else
+                    break;
+            }
+        }
+
+        return out;
+    }
+
     public void printShipLayout() {
         // TODO implement here
     }
@@ -79,7 +166,8 @@ public class BattleGrid {
     }
 
     private void recordShot(Point aPoint) {
-        shotHistory.add(aPoint);
-    }
 
+        shotHistory.add(aPoint);
+        quickShotLookup.add(aPoint);
+    }
 }
