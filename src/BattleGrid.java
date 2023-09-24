@@ -12,6 +12,9 @@ public class BattleGrid {
     public LinkedList<Point> shotHistory;
     public TreeSet<Point> quickShotLookup;
     public LinkedList<Ship> myShips;
+    public long startTime = 0;
+    public long endTime = 0;
+
     public static String LEFT = new String("LEFT");
     public static String RIGHT = new String("RIGHT");
     public static String UP = new String("UP");
@@ -63,6 +66,13 @@ public class BattleGrid {
 
     public ShotResult attemptShot(Point aPoint) {
 
+        if(startTime == 0) {
+
+            // start the attack timer on the first shot taken
+            startTime = System.nanoTime();
+            System.out.println("Attack start= " + startTime);
+        }
+
         ShotResult out = new ShotResult(false,"","");
 
         // See if the shot is duplicate, which is possible if it was made by a different
@@ -105,6 +115,17 @@ public class BattleGrid {
                 out = false;
             }
         }
+
+        if(out)
+        {
+            // Set the endTime the first moment we realize that the game is over
+            if(endTime == 0) {
+
+                endTime = System.nanoTime();
+                System.out.println("Attack end= " + endTime);
+            }
+        }
+
         return out;
     }
 
@@ -166,6 +187,13 @@ public class BattleGrid {
 
     public void printShotMap() {
         // TODO implement here
+    }
+
+    public long getDuration() {
+
+        // This is in nanoseconds.  If we use the millesecond clock it will just be zero, so divide the
+        // back to milliseconds in the spreadsheet
+        return (endTime - startTime);
     }
 
     private void recordShot(Point aPoint) {
