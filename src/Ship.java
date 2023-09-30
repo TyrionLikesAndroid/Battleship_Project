@@ -8,15 +8,17 @@ import java.util.*;
 public class Ship {
 
     public String name;
+    public String abbreviation;
     public int length;
     public HashMap<Point, Boolean> location;
-    public static String HEALTHY = new String("HEALTHY");
-    public static String SHOT = new String("SHOT");
-    public static String SUNK = new String("SUNK");
+    public static final String HEALTHY = "HEALTHY";
+    public static final String SHOT = "SHOT";
+    public static final String SUNK = "SUNK";
 
-    public Ship(String name, int length) {
+    public Ship(String name, String abbreviation, int length) {
         this.name = name;
         this.length = length;
+        this.abbreviation = abbreviation;
         location = new HashMap<>();
 
         System.out.println("Ship Created " + this.name + ":" + this.length);
@@ -24,7 +26,7 @@ public class Ship {
 
     public Ship clone()
     {
-        Ship cloneShip = new Ship(getName(), getLength());
+        Ship cloneShip = new Ship(getName(), abbreviation, getLength());
         LinkedList<Point> clonePoints = new LinkedList<>();
 
         Iterator<Point> myPoints = location.keySet().iterator();
@@ -47,9 +49,9 @@ public class Ship {
         }
     }
 
-    public Boolean attemptHit(Point aPoint) {
+    public boolean attemptHit(Point aPoint) {
 
-        Boolean out = false;
+        boolean out = false;
 
         Iterator<Point> myPoints = location.keySet().iterator();
         while(myPoints.hasNext())
@@ -62,6 +64,24 @@ public class Ship {
 
                 System.out.println("Hit: X=" + aPoint.x + ",Y=" + aPoint.y + ",Ship=" + this.getName() + ",status=" + this.getStatus());
 
+                break;
+            }
+        }
+
+        return out;
+    }
+
+    boolean hasLocation(Point aPoint)
+    {
+        boolean out = false;
+
+        Iterator<Point> myPoints = location.keySet().iterator();
+        while(myPoints.hasNext())
+        {
+            Point iPoint = myPoints.next();
+            if(iPoint.equals(aPoint))
+            {
+                out = true;
                 break;
             }
         }

@@ -15,10 +15,10 @@ public class BattleGrid {
     public long startTime = 0;
     public long endTime = 0;
 
-    public static String LEFT = new String("LEFT");
-    public static String RIGHT = new String("RIGHT");
-    public static String UP = new String("UP");
-    public static String DOWN = new String("DOWN");
+    public static final String LEFT = "LEFT";
+    public static final String RIGHT = "RIGHT";
+    public static final String UP = "UP";
+    public static final String DOWN = "DOWN";
 
     class PointCompare implements Comparator<Point> {
 
@@ -57,7 +57,7 @@ public class BattleGrid {
         return cloneGrid;
     }
 
-    public Boolean addToGrid(Ship ship) {
+    public boolean addToGrid(Ship ship) {
 
         System.out.println("Ship Added To Grid " + ship.name + ":" + ship.length);
         myShips.add(ship);
@@ -102,9 +102,9 @@ public class BattleGrid {
         return out;
     }
 
-    public Boolean checkGameOver() {
+    public boolean checkGameOver() {
 
-        Boolean out = true;
+        boolean out = true;
 
         Iterator<Ship> shipIterator = myShips.iterator();
         while(shipIterator.hasNext())
@@ -181,12 +181,49 @@ public class BattleGrid {
         return out;
     }
 
-    public void printShipLayout() {
-        // TODO implement here
+    public void printGrid() {
+
+        for(int i = 1; i <= width; i++)
+        {
+            System.out.append("|");
+            for(int j = 1; j <= length; j++)
+            {
+                // See if we have a shot at this position
+                Point gridPoint = new Point(j, i);
+                if(quickShotLookup.contains(gridPoint))
+                {
+                    // See if we have a ship at this location
+                    String shipAbbrev = checkShipLocation(gridPoint);
+                    if(! shipAbbrev.isEmpty())
+                    {
+                        System.out.append(shipAbbrev + "|");
+                    }
+                    else
+                        System.out.append("X|");
+                }
+                else
+                    System.out.append("O|");
+            }
+
+            System.out.println("");
+        }
     }
 
-    public void printShotMap() {
-        // TODO implement here
+    String checkShipLocation(Point aPoint)
+    {
+        String out = "";
+
+        Iterator<Ship> shipIterator = myShips.iterator();
+        while(shipIterator.hasNext())
+        {
+            Ship aShip = shipIterator.next();
+            if(aShip.hasLocation(aPoint))
+            {
+                out = aShip.abbreviation;
+                break;
+            }
+        }
+        return out;
     }
 
     public long getDuration() {
