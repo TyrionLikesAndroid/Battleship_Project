@@ -31,13 +31,13 @@ public class SimulationManager {
             return;
 
         // Create the map for our total results of all runs
-        HashMap<String, BattleGrid> iterationGames = null;
-        totalGames = new HashMap<Integer, HashMap<String, BattleGrid>>();
+        HashMap<String, BattleGrid> iterationGames;
+        totalGames = new HashMap<>();
 
         for(int i=0; i< numberOfGames; i++)
         {
             // Create the array for our results for this iteration
-            iterationGames = new HashMap<String, BattleGrid>();
+            iterationGames = new HashMap<>();
 
             // Create the ships and give them to the battle grid for the ship layout
             // that we will use for this iteration with all the different strategies
@@ -96,7 +96,7 @@ public class SimulationManager {
             while(iter.hasNext()) {
 
                 Map.Entry<Integer, HashMap<String, BattleGrid>> simulationEntry = iter.next();
-                int attackCounter = simulationEntry.getKey().intValue();
+                int attackCounter = simulationEntry.getKey();
                 Iterator<Map.Entry<String, BattleGrid>> attackIter = simulationEntry.getValue().entrySet().iterator();
 
                 while(attackIter.hasNext())

@@ -11,7 +11,7 @@ public class SimpleAttackStrategy extends AttackStrategy {
 
     public SimpleAttackStrategy(String name, int interval) {
 
-        super.AttackStrategy(name);
+        super(name);
 
         // Don't ever allow an interval less than one, we have to have a positive integer
         // to run a search

@@ -8,10 +8,10 @@ import java.util.*;
 public class SimplePlacementStrategy extends PlacementStrategy {
     public SimplePlacementStrategy() {
 
-        super.PlacementStrategy();
+        super();
     }
 
-    public Boolean placeShips(PriorityQueue<Ship> ships, BattleGrid aGrid)
+    public boolean placeShips(PriorityQueue<Ship> ships, BattleGrid aGrid)
     {
         // Simple strategy to place ships vertically in consecutive columns
         int column = 3;

@@ -1,14 +1,9 @@
 
-import java.util.*;
-
-/**
- * 
- */
 public abstract class AttackStrategy {
 
     public String name;
 
-    public void AttackStrategy(String name) {
+    public AttackStrategy(String name) {
 
         this.name = name;
     }

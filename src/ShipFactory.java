@@ -1,9 +1,4 @@
 
-import java.util.*;
-
-/**
- * 
- */
 public class ShipFactory {
 
     public static final String BATTLESHIP = "Battleship";

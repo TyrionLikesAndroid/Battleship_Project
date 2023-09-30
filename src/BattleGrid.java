@@ -40,9 +40,9 @@ public class BattleGrid {
     public BattleGrid(int length, int width) {
         this.length = length;
         this.width = width;
-        this.myShips = new LinkedList<Ship>();
-        this.shotHistory = new LinkedList<Point>();
-        this.quickShotLookup = new TreeSet<Point>(new PointCompare());
+        this.myShips = new LinkedList<>();
+        this.shotHistory = new LinkedList<>();
+        this.quickShotLookup = new TreeSet<>(new PointCompare());
     }
 
     public BattleGrid clone()
@@ -205,7 +205,7 @@ public class BattleGrid {
                     System.out.append("O|");
             }
 
-            System.out.println("");
+            System.out.println();
         }
     }
 

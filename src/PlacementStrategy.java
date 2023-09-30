@@ -9,9 +9,9 @@ public abstract class PlacementStrategy {
     /**
      * Default constructor
      */
-    public void PlacementStrategy() {
+    public PlacementStrategy() {
     }
 
-    public abstract Boolean placeShips(PriorityQueue<Ship> ships, BattleGrid aGrid);
+    public abstract boolean placeShips(PriorityQueue<Ship> ships, BattleGrid aGrid);
 
 }
