@@ -60,8 +60,8 @@ public class SimpleAttackStrategy extends AttackStrategy {
                 }
             }
 
-            // Reset x values for next loop
-            xValue = 1 + offsetNeeded;
+            // Keep the pattern going as if it just wraps around to the next line
+            xValue = xValue - xMax + offsetNeeded;
 
             // Check again since it's a double loop and we have to break twice
             if(aGrid.checkGameOver())
