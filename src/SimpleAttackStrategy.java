@@ -7,6 +7,10 @@ import java.util.*;
  */
 public class SimpleAttackStrategy extends AttackStrategy {
 
+    private static final String HORIZONTAL = "HORIZONTAL";
+    private static final String VERTICAL = "VERTICAL";
+    private static final String UNKNOWN = "UNKNOWN";
+
     int interval = 1;
 
     public SimpleAttackStrategy(String name, int interval) {
@@ -67,7 +71,6 @@ public class SimpleAttackStrategy extends AttackStrategy {
             if(aGrid.checkGameOver())
                 break;
         }
-
     }
 
     void shootToSink(BattleGrid aGrid, Point firstHit, String targetShip)
@@ -77,13 +80,13 @@ public class SimpleAttackStrategy extends AttackStrategy {
         // 2) Start shooting along that alignment
 
         // Determine the best direction to shoot based on available space
-        String bestDirection = determineBestDirection(aGrid,firstHit);
+        String bestDirection = determineBestDirection(aGrid,firstHit, UNKNOWN);
 
         // Start shooting in that direction
-        finishTargetShip(aGrid, firstHit, firstHit, targetShip, bestDirection);
+        finishTargetShip(aGrid, firstHit, firstHit, targetShip, bestDirection, UNKNOWN);
     }
 
-    void finishTargetShip(BattleGrid aGrid, Point currentHit, Point firstHit, String targetShip, String orientation) {
+    void finishTargetShip(BattleGrid aGrid, Point currentHit, Point firstHit, String targetShip, String orientation, String shipOrientation) {
 
         Point newAttack = calculateNextAttack(currentHit, orientation);
         ShotResult result = aGrid.attemptShot(newAttack);
@@ -91,9 +94,13 @@ public class SimpleAttackStrategy extends AttackStrategy {
             // We got another hit.  Verify that we hit the same ship or a different ship
             if (result.hitShipName.equals(targetShip)) {
                 // If we didn't sink it, keep shooting
-                if (!result.hitShipStatus.equals(Ship.SUNK))
-                    finishTargetShip(aGrid, newAttack, firstHit, targetShip, orientation);
+                if (!result.hitShipStatus.equals(Ship.SUNK)) {
 
+                    // It's the second hit on the same ship, so lock in orientation at this point in case
+                    // we shoot past the end of the ship.
+                    String realShipOrient = (newAttack.x == firstHit.x) ? VERTICAL : HORIZONTAL;
+                    finishTargetShip(aGrid, newAttack, firstHit, targetShip, orientation, realShipOrient);
+                }
                 return;
             } else {
                 // This is not our target ship, so write a log so we can test this case
@@ -108,11 +115,11 @@ public class SimpleAttackStrategy extends AttackStrategy {
 
         // Our original orientation was wrong if we got here, so calculate another orientation
         // and try again
-        String newOrientation = determineBestDirection(aGrid, firstHit);
+        String newOrientation = determineBestDirection(aGrid, firstHit, shipOrientation);
 
         // This should always succeed because we will have gone in both directions until it's sunk. Note
         // we had to go back to the first hit because we are changing direction
-        finishTargetShip(aGrid, firstHit, firstHit, targetShip, newOrientation);
+        finishTargetShip(aGrid, firstHit, firstHit, targetShip, newOrientation, shipOrientation);
     }
 
     Point calculateNextAttack(Point aPoint, String direction)
@@ -130,21 +137,30 @@ public class SimpleAttackStrategy extends AttackStrategy {
         return newAttack;
     }
 
-    String determineBestDirection(BattleGrid aGrid, Point aPoint)
+    String determineBestDirection(BattleGrid aGrid, Point aPoint, String shipOrientation)
     {
         // The tree is used so we can automatically determine which direction is best
         // because the keys will be sorted based on distance
         TreeMap<Integer, String> evalMap = new TreeMap<>();
+        int rightCheck = 0;
+        int leftCheck = 0;
+        int upCheck = 0;
+        int downCheck = 0;
 
         // Evaluate the battle grid spacing and determine the most promising direction
-        int rightCheck = aGrid.findOpenSpaces(aPoint, BattleGrid.RIGHT);
-        evalMap.put(rightCheck,"RIGHT");
-        int leftCheck = aGrid.findOpenSpaces(aPoint, BattleGrid.LEFT);
-        evalMap.put(leftCheck,"LEFT");
-        int upCheck = aGrid.findOpenSpaces(aPoint, BattleGrid.UP);
-        evalMap.put(upCheck,"UP");
-        int downCheck = aGrid.findOpenSpaces(aPoint, BattleGrid.DOWN);
-        evalMap.put(downCheck,"DOWN");
+        if(! shipOrientation.equals(VERTICAL)) {
+            rightCheck = aGrid.findOpenSpaces(aPoint, BattleGrid.RIGHT);
+            evalMap.put(rightCheck, "RIGHT");
+            leftCheck = aGrid.findOpenSpaces(aPoint, BattleGrid.LEFT);
+            evalMap.put(leftCheck, "LEFT");
+        }
+
+        if(! shipOrientation.equals(HORIZONTAL)) {
+            upCheck = aGrid.findOpenSpaces(aPoint, BattleGrid.UP);
+            evalMap.put(upCheck, "UP");
+            downCheck = aGrid.findOpenSpaces(aPoint, BattleGrid.DOWN);
+            evalMap.put(downCheck, "DOWN");
+        }
 
         System.out.println("Open up=" + upCheck + " Open down=" + downCheck + " Open left=" + leftCheck +
                 " Open right=" + rightCheck);
