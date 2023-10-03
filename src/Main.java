@@ -7,6 +7,7 @@ public class Main {
         LinkedList<AttackStrategy> aList = new LinkedList<>();
         aList.add(new SimpleAttackStrategy("Consecutive_Linear_1", 1));
         aList.add(new SimpleAttackStrategy("Consecutive_Linear_2", 2));
+        aList.add(new SimpleAttackStrategy("Consecutive_Linear_3", 3));
 
         SimulationManager mgr = new SimulationManager(new SimplePlacementStrategy(), aList);
         mgr.runSimulation(100);
