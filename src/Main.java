@@ -9,7 +9,7 @@ public class Main {
         aList.add(new SimpleAttackStrategy("Consecutive_Linear_2", 2));
         aList.add(new SimpleAttackStrategy("Consecutive_Linear_3", 3));
 
-        SimulationManager mgr = new SimulationManager(new SimplePlacementStrategy(), aList);
-        mgr.runSimulation(100);
+        SimulationManager mgr = new SimulationManager(new RandomPlacementStrategy(), aList);
+        mgr.runSimulation(1);
     }
 }
