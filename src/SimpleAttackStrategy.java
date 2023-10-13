@@ -35,7 +35,7 @@ public class SimpleAttackStrategy extends AttackStrategy {
 
         // Simple strategy to guess horizontally in based on the offset provided.  This
         // strategy will always go one row at a time, left to right
-        System.out.println("STARTING SEARCH STRATEGY");
+        //System.out.println("STARTING SEARCH STRATEGY");
         for(; yValue <= yMax; yValue++)
         {
             for(; xValue <= xMax; xValue = xValue + interval)
@@ -46,7 +46,7 @@ public class SimpleAttackStrategy extends AttackStrategy {
                 {
                     // Transition to the sink algorithm, which will sink the ship and
                     // then we can resume the search algorithm
-                    System.out.println("STARTING SINK STRATEGY");
+                    //System.out.println("STARTING SINK STRATEGY");
                     boolean sinkResult = shootToSink(aGrid, attackPoint, result.hitShipName);
                     if(! sinkResult)
                     {
@@ -61,7 +61,7 @@ public class SimpleAttackStrategy extends AttackStrategy {
                         System.out.println("Game over in " + aGrid.shotHistory.size() + " total shots");
                         break;
                     }
-                    System.out.println("RESUMING SEARCH STRATEGY");
+                    //System.out.println("RESUMING SEARCH STRATEGY");
                 }
             }
 

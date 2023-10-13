@@ -70,7 +70,7 @@ public class BattleGrid {
 
             // start the attack timer on the first shot taken
             startTime = System.nanoTime();
-            System.out.println("Attack start= " + startTime);
+            //System.out.println("Attack start= " + startTime);
         }
 
         ShotResult out = new ShotResult(false,"","");
@@ -93,8 +93,8 @@ public class BattleGrid {
             }
         }
 
-        if(! out.isHit)
-            System.out.println("Miss X=" + aPoint.x + ",Y=" + aPoint.y);
+        //if(! out.isHit)
+        //    System.out.println("Miss X=" + aPoint.x + ",Y=" + aPoint.y);
 
         //Make a record of the attack shot
         recordShot(aPoint);
@@ -122,7 +122,7 @@ public class BattleGrid {
             if(endTime == 0) {
 
                 endTime = System.nanoTime();
-                System.out.println("Attack end= " + endTime);
+                //System.out.println("Attack end= " + endTime);
             }
         }
 
@@ -212,6 +212,10 @@ public class BattleGrid {
     String checkShipLocation(Point aPoint)
     {
         String out = "";
+
+        // Make sure this location is on the grid in the first place.  Return F for fail.
+        if((aPoint.x > length) || (aPoint.y > width))
+            return "F";
 
         Iterator<Ship> shipIterator = myShips.iterator();
         while(shipIterator.hasNext())

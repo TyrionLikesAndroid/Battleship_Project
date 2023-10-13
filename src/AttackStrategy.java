@@ -53,7 +53,7 @@ public abstract class AttackStrategy {
             } else {
                 // This is not our target ship, so write a log so we can test this case
                 // and branch off and sink the new ship we found
-                System.out.println("Hit a different ship (" + result.hitShipName + "), pivoting to sink it first");
+                //System.out.println("Hit a different ship (" + result.hitShipName + "), pivoting to sink it first");
 
                 // Start another shootToSink loop, it should finish and then come back and
                 // continue sinking the original target that brought us here
@@ -68,7 +68,7 @@ public abstract class AttackStrategy {
 
             // Bail out and write an error if no moves are available.  This is most likely due to a
             // placement error so we need to debug this run
-            System.out.println("Stopping the attack - No valid moves available");
+            //System.out.println("Stopping the attack - No valid moves available");
             return false;
         }
 

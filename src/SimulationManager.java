@@ -58,9 +58,8 @@ public class SimulationManager {
                 // Record the results and move on to the next strategy
                 iterationGames.put(aStrat.getName(), gridClone);
 
-                // Print out the battlegrid for the last game of the run
-                if(i == (numberOfGames - 1))
-                    gridClone.printGrid();
+                // Print out the battlegrid
+                gridClone.printGrid();
             }
 
             // Add this iteration game map into the master game map
