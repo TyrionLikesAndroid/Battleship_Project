@@ -59,7 +59,7 @@ public class BattleGrid {
 
     public boolean addToGrid(Ship ship) {
 
-        System.out.println("Ship Added To Grid " + ship.name + ":" + ship.length);
+        //System.out.println("Ship Added To Grid " + ship.name + ":" + ship.length);
         myShips.add(ship);
         return true;
     }

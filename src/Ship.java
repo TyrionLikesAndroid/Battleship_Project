@@ -21,7 +21,7 @@ public class Ship {
         this.abbreviation = abbreviation;
         location = new HashMap<>();
 
-        System.out.println("Ship Created " + this.name + ":" + this.length);
+        //System.out.println("Ship Created " + this.name + ":" + this.length);
     }
 
     public Ship clone()

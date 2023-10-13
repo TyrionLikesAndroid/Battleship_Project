@@ -117,8 +117,8 @@ public abstract class AttackStrategy {
             evalMap.put(downCheck, "DOWN");
         }
 
-        System.out.println("Open up=" + upCheck + " Open down=" + downCheck + " Open left=" + leftCheck +
-                " Open right=" + rightCheck);
+        //System.out.println("Open up=" + upCheck + " Open down=" + downCheck + " Open left=" + leftCheck +
+        //        " Open right=" + rightCheck);
 
         // Prepare output value.  Make sure we have at least one direction that has a non-zero distance
         String out = "";

@@ -27,15 +27,15 @@ public class RandomPlacementStrategy extends PlacementStrategy {
             boolean shipPlaced = false;
 
             int rotation = rand.nextInt(2);
-            System.out.println("rotation " + rotation);
+            //System.out.println("rotation " + rotation);
 
             if (rotation == 1) {
                 int row = rand.nextInt(rows - 1) + 1;
                 //this is to make sure the ship is placed horizontally within the 10x10 grid
                 int col = rand.nextInt(columns - aShip.getLength() - 1) + 1;
-                System.out.println("row = " + row + " col = " + col);
+                //System.out.println("row = " + row + " col = " + col);
                 String check = aGrid.checkShipLocation(new Point(col, row));
-                System.out.println(check);
+                //System.out.println(check);
 
                 while(! shipPlaced) {
                     //check if the starting position is occupied
@@ -44,7 +44,7 @@ public class RandomPlacementStrategy extends PlacementStrategy {
                         col = rand.nextInt(columns - aShip.getLength() - 1) + 1;
                         check = aGrid.checkShipLocation(new Point(col, row));
                     }
-                    System.out.println("rerun: row = " + row + " col = " + col);
+                    //System.out.println("rerun: row = " + row + " col = " + col);
 
                     for (int x = col; x < col + aShip.getLength(); x++) {
                         //Make sure we aren't overlapping another ship
@@ -52,12 +52,12 @@ public class RandomPlacementStrategy extends PlacementStrategy {
                         check = aGrid.checkShipLocation(aPoint);
                         if (check.equals(""))
                         {
-                            System.out.println("Good location (" + aPoint.x + "," + aPoint.y + ")");
+                            //System.out.println("Good location (" + aPoint.x + "," + aPoint.y + ")");
                             location.add(aPoint);
                         }
                         else
                         {
-                            System.out.println("Horizontal ships overlapping, try again");
+                            //System.out.println("Horizontal ships overlapping, try again");
                             location.clear();  // reset the list so we can try again
                             break;
                         }
@@ -75,9 +75,9 @@ public class RandomPlacementStrategy extends PlacementStrategy {
                 int col = rand.nextInt(columns - 1) + 1;
                 //this is to make sure the ship is placed vertically within the 10x10 grid
                 int row = rand.nextInt(rows - aShip.getLength() - 1) + 1;
-                System.out.println("row = " + row + " col = " + col);
+                //System.out.println("row = " + row + " col = " + col);
                 String check = aGrid.checkShipLocation(new Point(col, row));
-                System.out.println(check);
+                //System.out.println(check);
 
                 while(! shipPlaced) {
                     //check if the random position is occupied
@@ -86,19 +86,19 @@ public class RandomPlacementStrategy extends PlacementStrategy {
                         col = rand.nextInt(columns - aShip.getLength() - 1) + 1;
                         check = aGrid.checkShipLocation(new Point(col, row));
                     }
-                    System.out.println("rerun: row = " + row + " col = " + col);
+                    //System.out.println("rerun: row = " + row + " col = " + col);
                     for (int y = row; y < row + aShip.getLength(); y++) {
                         //Make sure we aren't overlapping another ship
                         Point aPoint = new Point(y, col);
                         check = aGrid.checkShipLocation(aPoint);
                         if (check.equals(""))
                         {
-                            System.out.println("Good location (" + aPoint.x + "," + aPoint.y + ")");
+                            //System.out.println("Good location (" + aPoint.x + "," + aPoint.y + ")");
                             location.add(aPoint);
                         }
                         else
                         {
-                            System.out.println("Vertical ships overlapping, try again");
+                            //System.out.println("Vertical ships overlapping, try again");
                             location.clear();  // reset the list so we can try again
                             break;
                         }
