@@ -47,7 +47,13 @@ public class SimpleAttackStrategy extends AttackStrategy {
                     // Transition to the sink algorithm, which will sink the ship and
                     // then we can resume the search algorithm
                     System.out.println("STARTING SINK STRATEGY");
-                    shootToSink(aGrid, attackPoint, result.hitShipName);
+                    boolean sinkResult = shootToSink(aGrid, attackPoint, result.hitShipName);
+                    if(! sinkResult)
+                    {
+                        // Bail out immediately if we ever fail on the sink algorithm.  Something is
+                        // wrong that we need to debug
+                        return;
+                    }
 
                     // Once the ship is sunk, check game over condition
                     if(aGrid.checkGameOver())

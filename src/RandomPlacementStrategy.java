@@ -7,6 +7,7 @@ import java.util.Random;
  * 
  */
 public class RandomPlacementStrategy extends PlacementStrategy {
+
     public RandomPlacementStrategy() {
 
         super();
@@ -23,45 +24,89 @@ public class RandomPlacementStrategy extends PlacementStrategy {
         while (! ships.isEmpty()) {
             LinkedList<Point> location = new LinkedList<>();
             Ship aShip = ships.remove();
+            boolean shipPlaced = false;
+
             int rotation = rand.nextInt(2);
             System.out.println("rotation " + rotation);
+
             if (rotation == 1) {
-                int row = rand.nextInt(rows);
+                int row = rand.nextInt(rows - 1) + 1;
                 //this is to make sure the ship is placed horizontally within the 10x10 grid
-                int col = rand.nextInt(columns - aShip.getLength());
+                int col = rand.nextInt(columns - aShip.getLength() - 1) + 1;
                 System.out.println("row = " + row + " col = " + col);
                 String check = aGrid.checkShipLocation(new Point(col, row));
                 System.out.println(check);
-                //check if the random position is occupied
-                while (!check.equals("")) {
-                    row = rand.nextInt(rows);
-                    col = rand.nextInt(columns - aShip.getLength());
-                    check = aGrid.checkShipLocation(new Point(col, row));
-                }
-                System.out.println("rerun: row = " + row + " col = " + col);
 
-                for (int x = col; x < col + aShip.getLength(); x++) {
-                    location.add(new Point(row, x));
+                while(! shipPlaced) {
+                    //check if the starting position is occupied
+                    while (!check.equals("")) {
+                        row = rand.nextInt(rows - 1) + 1;
+                        col = rand.nextInt(columns - aShip.getLength() - 1) + 1;
+                        check = aGrid.checkShipLocation(new Point(col, row));
+                    }
+                    System.out.println("rerun: row = " + row + " col = " + col);
+
+                    for (int x = col; x < col + aShip.getLength(); x++) {
+                        //Make sure we aren't overlapping another ship
+                        Point aPoint = new Point(row, x);
+                        check = aGrid.checkShipLocation(aPoint);
+                        if (check.equals(""))
+                        {
+                            System.out.println("Good location (" + aPoint.x + "," + aPoint.y + ")");
+                            location.add(aPoint);
+                        }
+                        else
+                        {
+                            System.out.println("Horizontal ships overlapping, try again");
+                            location.clear();  // reset the list so we can try again
+                            break;
+                        }
+
+                        // Return true if the whole ship got placed
+                        if(location.size() == aShip.length)
+                            shipPlaced = true;
+                    }
                 }
+
                 aShip.setLocation(location);
                 aGrid.addToGrid(aShip);
                 //vertical
             } else {
-                int col = rand.nextInt(columns);
+                int col = rand.nextInt(columns - 1) + 1;
                 //this is to make sure the ship is placed vertically within the 10x10 grid
-                int row = rand.nextInt(rows - aShip.getLength());
+                int row = rand.nextInt(rows - aShip.getLength() - 1) + 1;
                 System.out.println("row = " + row + " col = " + col);
                 String check = aGrid.checkShipLocation(new Point(col, row));
                 System.out.println(check);
-                //check if the random position is occupied
-                while (!check.equals("")) {
-                    row = rand.nextInt(rows);
-                    col = rand.nextInt(columns - aShip.getLength());
-                    check = aGrid.checkShipLocation(new Point(col, row));
-                }
-                System.out.println("rerun: row = " + row + " col = " + col);
-                for (int y = row; y < row + aShip.getLength(); y++) {
-                    location.add(new Point(y, col));
+
+                while(! shipPlaced) {
+                    //check if the random position is occupied
+                    while (!check.equals("")) {
+                        row = rand.nextInt(rows - 1) + 1;
+                        col = rand.nextInt(columns - aShip.getLength() - 1) + 1;
+                        check = aGrid.checkShipLocation(new Point(col, row));
+                    }
+                    System.out.println("rerun: row = " + row + " col = " + col);
+                    for (int y = row; y < row + aShip.getLength(); y++) {
+                        //Make sure we aren't overlapping another ship
+                        Point aPoint = new Point(y, col);
+                        check = aGrid.checkShipLocation(aPoint);
+                        if (check.equals(""))
+                        {
+                            System.out.println("Good location (" + aPoint.x + "," + aPoint.y + ")");
+                            location.add(aPoint);
+                        }
+                        else
+                        {
+                            System.out.println("Vertical ships overlapping, try again");
+                            location.clear();  // reset the list so we can try again
+                            break;
+                        }
+
+                        // Return true if the whole ship got placed
+                        if(location.size() == aShip.length)
+                            shipPlaced = true;
+                    }
                 }
                 aShip.setLocation(location);
                 aGrid.addToGrid(aShip);

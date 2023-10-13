@@ -6,6 +6,7 @@ public abstract class AttackStrategy {
     private static final String HORIZONTAL = "HORIZONTAL";
     private static final String VERTICAL = "VERTICAL";
     private static final String UNKNOWN = "UNKNOWN";
+    private static final String NO_MOVE_AVAILABLE = "NO MOVE";
 
     public String name;
 
@@ -20,7 +21,7 @@ public abstract class AttackStrategy {
         return name;
     }
 
-    protected void shootToSink(BattleGrid aGrid, Point firstHit, String targetShip)
+    protected boolean shootToSink(BattleGrid aGrid, Point firstHit, String targetShip)
     {
         // Once the search strategy finds a ship, you call the sink strategy, which works as follows:
         // 1) Find the most valuable direction for the next shot
@@ -30,10 +31,10 @@ public abstract class AttackStrategy {
         String bestDirection = determineBestDirection(aGrid,firstHit, UNKNOWN);
 
         // Start shooting in that direction
-        finishTargetShip(aGrid, firstHit, firstHit, targetShip, bestDirection, UNKNOWN);
+        return finishTargetShip(aGrid, firstHit, firstHit, targetShip, bestDirection, UNKNOWN);
     }
 
-    private void finishTargetShip(BattleGrid aGrid, Point currentHit, Point firstHit, String targetShip, String orientation, String shipOrientation) {
+    private boolean finishTargetShip(BattleGrid aGrid, Point currentHit, Point firstHit, String targetShip, String orientation, String shipOrientation) {
 
         Point newAttack = calculateNextAttack(currentHit, orientation);
         ShotResult result = aGrid.attemptShot(newAttack);
@@ -46,9 +47,9 @@ public abstract class AttackStrategy {
                     // It's the second hit on the same ship, so lock in orientation at this point in case
                     // we shoot past the end of the ship.
                     String realShipOrient = (newAttack.x == firstHit.x) ? VERTICAL : HORIZONTAL;
-                    finishTargetShip(aGrid, newAttack, firstHit, targetShip, orientation, realShipOrient);
+                    return finishTargetShip(aGrid, newAttack, firstHit, targetShip, orientation, realShipOrient);
                 }
-                return;
+                return true;
             } else {
                 // This is not our target ship, so write a log so we can test this case
                 // and branch off and sink the new ship we found
@@ -63,10 +64,17 @@ public abstract class AttackStrategy {
         // Our original orientation was wrong if we got here, so calculate another orientation
         // and try again
         String newOrientation = determineBestDirection(aGrid, firstHit, shipOrientation);
+        if(newOrientation.equals(NO_MOVE_AVAILABLE)) {
+
+            // Bail out and write an error if no moves are available.  This is most likely due to a
+            // placement error so we need to debug this run
+            System.out.println("Stopping the attack - No valid moves available");
+            return false;
+        }
 
         // This should always succeed because we will have gone in both directions until it's sunk. Note
         // we had to go back to the first hit because we are changing direction
-        finishTargetShip(aGrid, firstHit, firstHit, targetShip, newOrientation, shipOrientation);
+        return finishTargetShip(aGrid, firstHit, firstHit, targetShip, newOrientation, shipOrientation);
     }
 
     private Point calculateNextAttack(Point aPoint, String direction)
@@ -112,10 +120,19 @@ public abstract class AttackStrategy {
         System.out.println("Open up=" + upCheck + " Open down=" + downCheck + " Open left=" + leftCheck +
                 " Open right=" + rightCheck);
 
-        // Get the last map entry, which is the direction with the most distance.  If there is a tie
-        // the last one in the list will be the winner, which is fine for now.  We will use this to
-        // determine the new attack point
-        return evalMap.lastEntry().getValue();
+        // Prepare output value.  Make sure we have at least one direction that has a non-zero distance
+        String out = "";
+        if((upCheck + downCheck + leftCheck + rightCheck) > 0)
+        {
+            // Get the last map entry, which is the direction with the most distance.  If there is a tie
+            // the last one in the list will be the winner, which is fine for now.  We will use this to
+            // determine the new attack point
+            out = evalMap.lastEntry().getValue();
+        }
+        else
+            out = NO_MOVE_AVAILABLE;
+
+        return out;
     }
 
 }
