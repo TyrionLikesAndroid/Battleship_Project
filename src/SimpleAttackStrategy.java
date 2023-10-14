@@ -22,7 +22,7 @@ public class SimpleAttackStrategy extends AttackStrategy {
 
         System.out.println("Attacking using strategy:" + getName());
 
-        int offsetNeeded = 0;
+        boolean offsetNeeded = false;
         int xValue = 1;
         int yValue = 1;
         int xMax = aGrid.width;
@@ -31,7 +31,7 @@ public class SimpleAttackStrategy extends AttackStrategy {
         // Make sure we are offsetting if the interval divides evenly into the width.
         // If we don't this, we will shoot in the same columns on every row.
         if(interval > 1)
-            offsetNeeded = ((xMax % interval) == 0) ? 1 : 0;
+            offsetNeeded = ((xMax % interval) == 0);
 
         // Simple strategy to guess horizontally in based on the offset provided.  This
         // strategy will always go one row at a time, left to right
@@ -66,7 +66,10 @@ public class SimpleAttackStrategy extends AttackStrategy {
             }
 
             // Keep the pattern going as if it just wraps around to the next line
-            xValue = xValue - xMax + offsetNeeded;
+            if(offsetNeeded)
+                xValue = ((xValue % 2) == 0) ? 1 : 2;
+            else
+                xValue = 1;
 
             // Check again since it's a double loop and we have to break twice
             if(aGrid.checkGameOver())
