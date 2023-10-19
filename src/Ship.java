@@ -53,19 +53,9 @@ public class Ship {
 
         boolean out = false;
 
-        Iterator<Point> myPoints = location.keySet().iterator();
-        while(myPoints.hasNext())
-        {
-            Point iPoint = myPoints.next();
-            if(iPoint.equals(aPoint))
-            {
-                recordHit(aPoint);
-                out = true;
-
-                //System.out.println("Hit: X=" + aPoint.x + ",Y=" + aPoint.y + ",Ship=" + this.getName() + ",status=" + this.getStatus());
-
-                break;
-            }
+        if(location.containsKey(aPoint)) {
+            recordHit(aPoint);
+            out = true;
         }
 
         return out;
@@ -73,20 +63,7 @@ public class Ship {
 
     boolean hasLocation(Point aPoint)
     {
-        boolean out = false;
-
-        Iterator<Point> myPoints = location.keySet().iterator();
-        while(myPoints.hasNext())
-        {
-            Point iPoint = myPoints.next();
-            if(iPoint.equals(aPoint))
-            {
-                out = true;
-                break;
-            }
-        }
-
-        return out;
+        return location.containsKey(aPoint);
     }
 
     public String getStatus()

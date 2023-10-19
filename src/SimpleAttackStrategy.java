@@ -20,7 +20,7 @@ public class SimpleAttackStrategy extends AttackStrategy {
 
     public void attack(BattleGrid aGrid) {
 
-        //System.out.println("Attacking using strategy:" + getName());
+        System.out.println("Attacking using strategy:" + getName());
 
         boolean offsetNeeded = false;
         boolean offsetSwitch = true;
@@ -61,7 +61,7 @@ public class SimpleAttackStrategy extends AttackStrategy {
                     if(aGrid.checkGameOver())
                     {
                         isGameOver = true;
-                        //System.out.println("Game over in " + aGrid.shotHistory.size() + " total shots");
+                        System.out.println("Game over in " + aGrid.shotHistory.size() + " total shots");
                         break;
                     }
                     //System.out.println("RESUMING SEARCH STRATEGY");
