@@ -33,7 +33,7 @@ public class Ship {
         while(myPoints.hasNext())
         {
             Point iPoint = myPoints.next();
-            clonePoints.add(new Point(iPoint.x, iPoint.y));
+            clonePoints.add(GameFactory.newPoint(iPoint.x, iPoint.y));
         }
         cloneShip.setLocation(clonePoints);
         return cloneShip;

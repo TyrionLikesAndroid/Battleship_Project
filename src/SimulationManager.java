@@ -1,4 +1,5 @@
 
+import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.util.*;
@@ -59,7 +60,7 @@ public class SimulationManager {
                 iterationGames.put(aStrat.getName(), gridClone);
 
                 // Print out the battlegrid
-                gridClone.printGrid();
+                //gridClone.printGrid();
             }
 
             // Add this iteration game map into the master game map
@@ -121,21 +122,83 @@ public class SimulationManager {
 
         PriorityQueue<Ship> ships = new PriorityQueue<>(new ShipCompare());
 
-        Ship ship = ShipFactory.createShip(ShipFactory.BATTLESHIP);
+        Ship ship = GameFactory.createShip(GameFactory.BATTLESHIP);
         ships.add(ship);
-        ship = ShipFactory.createShip(ShipFactory.CRUISER);
+        ship = GameFactory.createShip(GameFactory.CRUISER);
         ships.add(ship);
-        ship = ShipFactory.createShip(ShipFactory.DESTROYER);
+        ship = GameFactory.createShip(GameFactory.DESTROYER);
         ships.add(ship);
-        ship = ShipFactory.createShip(ShipFactory.SUBMARINE);
+        ship = GameFactory.createShip(GameFactory.SUBMARINE);
         ships.add(ship);
-        ship = ShipFactory.createShip(ShipFactory.CARRIER);
+        ship = GameFactory.createShip(GameFactory.CARRIER);
         ships.add(ship);
 
         return ships;
     }
 
     private BattleGrid createBattleGrid() {
-        return new BattleGrid(10,10);
+        return GameFactory.createGrid();
+    }
+
+    public void testPlacement(int numberOfGames) {
+
+        if(numberOfGames == 0)
+            return;
+
+        // Make a list to grab all of the grids after we place ships
+        LinkedList<BattleGrid> gridList = new LinkedList<>();
+
+        for(int i=0; i< numberOfGames; i++)
+        {
+            // Create a grid and place the ships
+            BattleGrid gameGrid = createBattleGrid();
+            pStrat.placeShips(createShips(), gameGrid);
+
+            // Add this iteration game map into the master game map
+            gridList.add(gameGrid);
+        }
+
+        // Make a map to hold the ship placement totals
+        HashMap<Point, Integer> placeMap = new HashMap<>();
+        Iterator<BattleGrid> gridIter = gridList.iterator();
+        Iterator<Ship> shipIter;
+        Iterator<Point> pntIter;
+
+        while(gridIter.hasNext())
+        {
+            BattleGrid aGrid = gridIter.next();
+            shipIter = aGrid.myShips.iterator();
+            while(shipIter.hasNext())
+            {
+                Ship aShip = shipIter.next();
+                pntIter = aShip.location.keySet().iterator();
+                while(pntIter.hasNext())
+                {
+                    Point aPoint = pntIter.next();
+                    if(placeMap.containsKey(aPoint))
+                    {
+                        int value = placeMap.get(aPoint);
+                        value++;
+                        placeMap.put(aPoint,value);
+                    }
+                    else
+                    {
+                        placeMap.put(aPoint,1);
+                    }
+                }
+            }
+        }
+
+        for(int i= 1; i <= 10; i++)
+        {
+            for(int j= 1; j <= 10; j++)
+            {
+                Point testPoint = GameFactory.newPoint(i, j);
+                Integer count = placeMap.get(testPoint);
+
+                int out = (count == null) ? 0 : count;
+                System.out.println("(" + testPoint.x + "," + testPoint.y + ") = " + out);
+            }
+        }
     }
 }

@@ -79,15 +79,13 @@ public abstract class AttackStrategy {
 
     private Point calculateNextAttack(Point aPoint, String direction)
     {
-        Point newAttack = new Point(aPoint);
-        if (direction.equals(BattleGrid.RIGHT))
-            newAttack.x++;
-        else if (direction.equals(BattleGrid.LEFT))
-            newAttack.x--;
-        else if (direction.equals(BattleGrid.UP))
-            newAttack.y--;
-        else if (direction.equals(BattleGrid.DOWN))
-            newAttack.y++;
+        Point newAttack = GameFactory.newPoint(aPoint);
+        switch (direction) {
+            case BattleGrid.RIGHT -> newAttack.x++;
+            case BattleGrid.LEFT -> newAttack.x--;
+            case BattleGrid.UP -> newAttack.y--;
+            case BattleGrid.DOWN -> newAttack.y++;
+        }
 
         return newAttack;
     }

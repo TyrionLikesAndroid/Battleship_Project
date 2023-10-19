@@ -30,25 +30,25 @@ public class RandomPlacementStrategy extends PlacementStrategy {
             //System.out.println("rotation " + rotation);
 
             if (rotation == 1) {
-                int row = rand.nextInt(rows - 1) + 1;
+                int row = rand.nextInt(rows) + 1;
                 //this is to make sure the ship is placed horizontally within the 10x10 grid
-                int col = rand.nextInt(columns - aShip.getLength() - 1) + 1;
+                int col = rand.nextInt(columns - aShip.getLength()) + 1;
                 //System.out.println("row = " + row + " col = " + col);
-                String check = aGrid.checkShipLocation(new Point(col, row));
+                String check = aGrid.checkShipLocation(GameFactory.newPoint(col, row));
                 //System.out.println(check);
 
                 while(! shipPlaced) {
                     //check if the starting position is occupied
                     while (!check.equals("")) {
-                        row = rand.nextInt(rows - 1) + 1;
-                        col = rand.nextInt(columns - aShip.getLength() - 1) + 1;
-                        check = aGrid.checkShipLocation(new Point(col, row));
+                        row = rand.nextInt(rows) + 1;
+                        col = rand.nextInt(columns - aShip.getLength()) + 1;
+                        check = aGrid.checkShipLocation(GameFactory.newPoint(col, row));
                     }
                     //System.out.println("rerun: row = " + row + " col = " + col);
 
                     for (int x = col; x < col + aShip.getLength(); x++) {
                         //Make sure we aren't overlapping another ship
-                        Point aPoint = new Point(row, x);
+                        Point aPoint = GameFactory.newPoint(row, x);
                         check = aGrid.checkShipLocation(aPoint);
                         if (check.equals(""))
                         {
@@ -72,24 +72,24 @@ public class RandomPlacementStrategy extends PlacementStrategy {
                 aGrid.addToGrid(aShip);
                 //vertical
             } else {
-                int col = rand.nextInt(columns - 1) + 1;
+                int col = rand.nextInt(columns) + 1;
                 //this is to make sure the ship is placed vertically within the 10x10 grid
-                int row = rand.nextInt(rows - aShip.getLength() - 1) + 1;
+                int row = rand.nextInt(rows - aShip.getLength()) + 1;
                 //System.out.println("row = " + row + " col = " + col);
-                String check = aGrid.checkShipLocation(new Point(col, row));
+                String check = aGrid.checkShipLocation(GameFactory.newPoint(col, row));
                 //System.out.println(check);
 
                 while(! shipPlaced) {
                     //check if the random position is occupied
                     while (!check.equals("")) {
-                        row = rand.nextInt(rows - 1) + 1;
-                        col = rand.nextInt(columns - aShip.getLength() - 1) + 1;
-                        check = aGrid.checkShipLocation(new Point(col, row));
+                        row = rand.nextInt(rows) + 1;
+                        col = rand.nextInt(columns - aShip.getLength()) + 1;
+                        check = aGrid.checkShipLocation(GameFactory.newPoint(col, row));
                     }
                     //System.out.println("rerun: row = " + row + " col = " + col);
                     for (int y = row; y < row + aShip.getLength(); y++) {
                         //Make sure we aren't overlapping another ship
-                        Point aPoint = new Point(y, col);
+                        Point aPoint = GameFactory.newPoint(y, col);
                         check = aGrid.checkShipLocation(aPoint);
                         if (check.equals(""))
                         {

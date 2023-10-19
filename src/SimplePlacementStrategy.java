@@ -21,7 +21,7 @@ public class SimplePlacementStrategy extends PlacementStrategy {
             Ship aShip = ships.remove();
             for(int i = 1; i <= aShip.getLength(); i++)
             {
-                location.add(new Point(column,i));
+                location.add(GameFactory.newPoint(column,i));
             }
 
             column++;

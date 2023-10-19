@@ -47,7 +47,7 @@ public class BattleGrid {
 
     public BattleGrid clone()
     {
-        BattleGrid cloneGrid = new BattleGrid(this.length, this.width);
+        BattleGrid cloneGrid = GameFactory.createGrid();
         Iterator<Ship> iter = myShips.iterator();
         while(iter.hasNext())
         {
@@ -137,44 +137,38 @@ public class BattleGrid {
         int yValue = aPoint.y;
         int xValue = aPoint.x;
 
-        if(direction.equals(LEFT))
-        {
-            for (int i = aPoint.x - 1; i > 0; i--)
-            {
-                if(! quickShotLookup.contains(new Point(i, yValue)))
-                    out++;
-                else
-                    break;
+        switch (direction) {
+            case LEFT -> {
+                for (int i = aPoint.x - 1; i > 0; i--) {
+                    if (!quickShotLookup.contains(GameFactory.newPoint(i, yValue)))
+                        out++;
+                    else
+                        break;
+                }
             }
-        }
-        else if(direction.equals(RIGHT))
-        {
-            for (int i = aPoint.x + 1; i <= width; i++)
-            {
-                if(! quickShotLookup.contains(new Point(i, yValue)))
-                    out++;
-                else
-                    break;
+            case RIGHT -> {
+                for (int i = aPoint.x + 1; i <= width; i++) {
+                    if (!quickShotLookup.contains(GameFactory.newPoint(i, yValue)))
+                        out++;
+                    else
+                        break;
+                }
             }
-        }
-        else if(direction.equals(UP))
-        {
-            for (int i = aPoint.y - 1; i > 0; i--)
-            {
-                if(! quickShotLookup.contains(new Point(xValue, i)))
-                    out++;
-                else
-                    break;
+            case UP -> {
+                for (int i = aPoint.y - 1; i > 0; i--) {
+                    if (!quickShotLookup.contains(GameFactory.newPoint(xValue, i)))
+                        out++;
+                    else
+                        break;
+                }
             }
-        }
-        else if(direction.equals(DOWN))
-        {
-            for (int i = aPoint.y + 1; i <= length; i++)
-            {
-                if(! quickShotLookup.contains(new Point(xValue, i)))
-                    out++;
-                else
-                    break;
+            case DOWN -> {
+                for (int i = aPoint.y + 1; i <= length; i++) {
+                    if (!quickShotLookup.contains(GameFactory.newPoint(xValue, i)))
+                        out++;
+                    else
+                        break;
+                }
             }
         }
 
@@ -189,7 +183,7 @@ public class BattleGrid {
             for(int j = 1; j <= length; j++)
             {
                 // See if we have a shot at this position
-                Point gridPoint = new Point(j, i);
+                Point gridPoint = GameFactory.newPoint(j, i);
                 if(quickShotLookup.contains(gridPoint))
                 {
                     // See if we have a ship at this location

@@ -20,9 +20,11 @@ public class SimpleAttackStrategy extends AttackStrategy {
 
     public void attack(BattleGrid aGrid) {
 
-        System.out.println("Attacking using strategy:" + getName());
+        //System.out.println("Attacking using strategy:" + getName());
 
         boolean offsetNeeded = false;
+        boolean offsetSwitch = true;
+        boolean isGameOver = false;
         int xValue = 1;
         int yValue = 1;
         int xMax = aGrid.width;
@@ -40,7 +42,7 @@ public class SimpleAttackStrategy extends AttackStrategy {
         {
             for(; xValue <= xMax; xValue = xValue + interval)
             {
-                Point attackPoint = new Point(xValue, yValue);
+                Point attackPoint = GameFactory.newPoint(xValue, yValue);
                 ShotResult result = aGrid.attemptShot(attackPoint);
                 if(result.isHit)
                 {
@@ -58,7 +60,8 @@ public class SimpleAttackStrategy extends AttackStrategy {
                     // Once the ship is sunk, check game over condition
                     if(aGrid.checkGameOver())
                     {
-                        System.out.println("Game over in " + aGrid.shotHistory.size() + " total shots");
+                        isGameOver = true;
+                        //System.out.println("Game over in " + aGrid.shotHistory.size() + " total shots");
                         break;
                     }
                     //System.out.println("RESUMING SEARCH STRATEGY");
@@ -67,12 +70,19 @@ public class SimpleAttackStrategy extends AttackStrategy {
 
             // Keep the pattern going as if it just wraps around to the next line
             if(offsetNeeded)
-                xValue = ((xValue % 2) == 0) ? 1 : 2;
+            {
+                if(offsetSwitch)
+                    xValue = 2;
+                else
+                    xValue = 1;
+
+                offsetSwitch = ! offsetSwitch;  // Flip the switch.  This is silly code, but it should be fast
+            }
             else
                 xValue = 1;
 
             // Check again since it's a double loop and we have to break twice
-            if(aGrid.checkGameOver())
+            if(isGameOver)
                 break;
         }
     }
