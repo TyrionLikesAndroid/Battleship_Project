@@ -50,7 +50,7 @@ public class GameFactory {
             bGridVector.add(i,aGrid);
         }
 
-        for(int i = 0; i < 900000; i++)
+        for(int i = 0; i < 4000000; i++)
         {
             aPoint = new Point();
             pntVector.add(i,aPoint);
