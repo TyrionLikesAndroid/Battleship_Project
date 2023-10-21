@@ -37,6 +37,8 @@ public class SimulationManager {
 
         for(int i=0; i< numberOfGames; i++)
         {
+            System.out.println("Game Iteration:" + i);
+
             // Create the array for our results for this iteration
             iterationGames = new HashMap<>();
 
@@ -60,7 +62,7 @@ public class SimulationManager {
                 iterationGames.put(aStrat.getName(), gridClone);
 
                 // Print out the battlegrid
-                gridClone.printGrid();
+                //gridClone.printGrid();
             }
 
             // Add this iteration game map into the master game map

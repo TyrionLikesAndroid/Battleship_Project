@@ -28,32 +28,58 @@ public class BruteForceAttackStrategy extends AttackStrategy {
         int xValue = 1;
         int yValue = 1;
         int cellValue = 0;
+        Point nextShot = null;
 
         // Make a run loop that will go forever.  The break condition will be game over
         while(true)
         {
-            // Calculate the value for each cell in the grid based on the criteria
-            // of open consecutive positions in each direction
-            for (; yValue <= yMax; yValue++) {
-                for (; xValue <= xMax; xValue++) {
+            if(nextShot == null) {
 
-                    // Skip any cells that have already registered a hit.  We want to ignore these in the
-                    // future runs so the algorithm will get a little faster and stop looping
-                    Point targetPoint = GameFactory.newPoint(xValue, yValue);
-                    if(! aGrid.quickShotLookup.contains(targetPoint)) {
+                // First time through, calculate the value for each cell in the grid based on the criteria
+                // of open consecutive positions in each direction
+                for (; yValue <= yMax; yValue++) {
+                    for (; xValue <= xMax; xValue++) {
+
+                        Point targetPoint = GameFactory.newPoint(xValue, yValue);
                         cellValue = calculateCellValue(targetPoint, aGrid);
                         cellValueMap.put(targetPoint, cellValue);
                         //System.out.println("BF Attack Value (" + targetPoint.x + "," + targetPoint.y + ") = " + cellValue);
                     }
+
+                    // Reset X for the next row
+                    xValue = 1;
+                }
+            }
+            else
+            {
+                // Every subsequent time through the loop, just update the rows that are now "dirty"
+                // due to the last shot that was placed
+                yValue = nextShot.y;
+                xValue = nextShot.x;
+
+                for(int i = 1; i <= xMax; i++)
+                {
+                    // Only update the cells in the horizontal row. Skip any cells that have already been shot
+                    Point targetPoint = GameFactory.newPoint(i, yValue);
+                    if (!aGrid.quickShotLookup.contains(targetPoint)) {
+                        cellValue = calculateCellValue(targetPoint, aGrid);
+                        cellValueMap.put(targetPoint, cellValue);
+                    }
                 }
 
-                // Reset X for the next row
-                xValue = 1;
+                for(int j = 1; j <= yMax; j++)
+                {
+                    // Only update the cells in the horizontal row.  Skip any cells that have already been shot
+                    Point targetPoint = GameFactory.newPoint(xValue, j);
+                    if (!aGrid.quickShotLookup.contains(targetPoint)) {
+                        cellValue = calculateCellValue(targetPoint, aGrid);
+                        cellValueMap.put(targetPoint, cellValue);
+                    }
+                }
             }
-            // Reset Y for next iteration
-            yValue = 1;
 
-            Point nextShot = mostValuableNextShot();
+            // Find the most valuable shot now that all the cells have been updated
+            nextShot = mostValuableNextShot();
             //System.out.println("Next Shot (" + nextShot.x + "," + nextShot.y + ")");
 
             ShotResult result = aGrid.attemptShot(nextShot);
