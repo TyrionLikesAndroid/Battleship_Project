@@ -17,7 +17,7 @@ public class Main {
         //System.gc();
         //try { Thread.sleep(2000); } catch (Exception e) {e.printStackTrace();};
 
-        mgr.runSimulation(100);
+        mgr.runSimulation(1);
     }
 
     // This is a test function for checking out how well the placement strategy is using

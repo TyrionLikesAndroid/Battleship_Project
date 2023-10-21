@@ -14,6 +14,7 @@ public class BattleGrid {
     public LinkedList<Ship> myShips;
     public long startTime = 0;
     public long endTime = 0;
+    Point recyclePnt;
 
     public static final String LEFT = "LEFT";
     public static final String RIGHT = "RIGHT";
@@ -43,6 +44,7 @@ public class BattleGrid {
         this.myShips = new LinkedList<>();
         this.shotHistory = new LinkedList<>();
         this.quickShotLookup = new TreeSet<>(new PointCompare());
+        this.recyclePnt = new Point();
     }
 
     public BattleGrid clone()
@@ -140,7 +142,8 @@ public class BattleGrid {
         switch (direction) {
             case LEFT -> {
                 for (int i = aPoint.x - 1; i > 0; i--) {
-                    if (!quickShotLookup.contains(GameFactory.newPoint(i, yValue)))
+                    recyclePnt.setLocation(i, yValue);
+                    if (!quickShotLookup.contains(recyclePnt))
                         out++;
                     else
                         break;
@@ -148,7 +151,8 @@ public class BattleGrid {
             }
             case RIGHT -> {
                 for (int i = aPoint.x + 1; i <= width; i++) {
-                    if (!quickShotLookup.contains(GameFactory.newPoint(i, yValue)))
+                    recyclePnt.setLocation(i, yValue);
+                    if (!quickShotLookup.contains(recyclePnt))
                         out++;
                     else
                         break;
@@ -156,7 +160,8 @@ public class BattleGrid {
             }
             case UP -> {
                 for (int i = aPoint.y - 1; i > 0; i--) {
-                    if (!quickShotLookup.contains(GameFactory.newPoint(xValue, i)))
+                    recyclePnt.setLocation(xValue, i);
+                    if (!quickShotLookup.contains(recyclePnt))
                         out++;
                     else
                         break;
@@ -164,7 +169,8 @@ public class BattleGrid {
             }
             case DOWN -> {
                 for (int i = aPoint.y + 1; i <= length; i++) {
-                    if (!quickShotLookup.contains(GameFactory.newPoint(xValue, i)))
+                    recyclePnt.setLocation(xValue, i);
+                    if (!quickShotLookup.contains(recyclePnt))
                         out++;
                     else
                         break;
@@ -183,11 +189,11 @@ public class BattleGrid {
             for(int j = 1; j <= length; j++)
             {
                 // See if we have a shot at this position
-                Point gridPoint = GameFactory.newPoint(j, i);
-                if(quickShotLookup.contains(gridPoint))
+                recyclePnt.setLocation(j, i);
+                if(quickShotLookup.contains(recyclePnt))
                 {
                     // See if we have a ship at this location
-                    String shipAbbrev = checkShipLocation(gridPoint);
+                    String shipAbbrev = checkShipLocation(recyclePnt);
                     if(! shipAbbrev.isEmpty())
                     {
                         System.out.append(shipAbbrev + "|");

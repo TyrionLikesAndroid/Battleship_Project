@@ -60,7 +60,7 @@ public class SimulationManager {
                 iterationGames.put(aStrat.getName(), gridClone);
 
                 // Print out the battlegrid
-                //gridClone.printGrid();
+                gridClone.printGrid();
             }
 
             // Add this iteration game map into the master game map
