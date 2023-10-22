@@ -10,13 +10,15 @@ import java.util.Map;
  */
 public class BruteForceAttackStrategy extends AttackStrategy {
 
-    HashMap<Point,Integer> cellValueMap;
+    HashMap<Integer,Integer> cellValueMap;
+    Point recyclePnt;
 
     public BruteForceAttackStrategy(String name) {
 
         super(name);
 
-        cellValueMap = new HashMap<Point, Integer>();
+        cellValueMap = new HashMap<Integer, Integer>();
+        recyclePnt = new Point();
     }
 
     public void attack(BattleGrid aGrid) {
@@ -40,10 +42,10 @@ public class BruteForceAttackStrategy extends AttackStrategy {
                 for (; yValue <= yMax; yValue++) {
                     for (; xValue <= xMax; xValue++) {
 
-                        Point targetPoint = GameFactory.newPoint(xValue, yValue);
-                        cellValue = calculateCellValue(targetPoint, aGrid);
-                        cellValueMap.put(targetPoint, cellValue);
-                        //System.out.println("BF Attack Value (" + targetPoint.x + "," + targetPoint.y + ") = " + cellValue);
+                        recyclePnt.setLocation(xValue,yValue);
+                        cellValue = calculateCellValue(recyclePnt, aGrid);
+                        updateValueMap(recyclePnt,cellValue);
+                        //System.out.println("BF Attack Value (" + recyclePnt.x + "," + recyclePnt.y + ") = " + cellValue);
                     }
 
                     // Reset X for the next row
@@ -60,36 +62,37 @@ public class BruteForceAttackStrategy extends AttackStrategy {
                 for(int i = 1; i <= xMax; i++)
                 {
                     // Only update the cells in the horizontal row. Skip any cells that have already been shot
-                    Point targetPoint = GameFactory.newPoint(i, yValue);
-                    if (!aGrid.quickShotLookup.contains(targetPoint)) {
-                        cellValue = calculateCellValue(targetPoint, aGrid);
-                        cellValueMap.put(targetPoint, cellValue);
+                    recyclePnt.setLocation(i, yValue);
+                    if (!aGrid.quickShotLookup.contains(recyclePnt)) {
+                        cellValue = calculateCellValue(recyclePnt, aGrid);
+                        updateValueMap(recyclePnt,cellValue);
                     }
                 }
 
                 for(int j = 1; j <= yMax; j++)
                 {
                     // Only update the cells in the horizontal row.  Skip any cells that have already been shot
-                    Point targetPoint = GameFactory.newPoint(xValue, j);
-                    if (!aGrid.quickShotLookup.contains(targetPoint)) {
-                        cellValue = calculateCellValue(targetPoint, aGrid);
-                        cellValueMap.put(targetPoint, cellValue);
+                    recyclePnt.setLocation(xValue, j);
+                    if (!aGrid.quickShotLookup.contains(recyclePnt)) {
+                        cellValue = calculateCellValue(recyclePnt, aGrid);
+                        updateValueMap(recyclePnt,cellValue);
                     }
                 }
             }
 
-            // Find the most valuable shot now that all the cells have been updated
+            // Find the most valuable shot now that all the cells have been updated and attempt
+            // a shot at that location
             nextShot = mostValuableNextShot();
             //System.out.println("Next Shot (" + nextShot.x + "," + nextShot.y + ")");
 
-            ShotResult result = aGrid.attemptShot(nextShot);
 
-            // After we take a shot, assign the cell a value of zero immediately so it won't
+            // After we select the best ell, assign the cell a value of zero so it won't
             // be considered in the next iteration.
-            cellValueMap.put(nextShot,0);
+            updateValueMap(nextShot,0);
 
+            ShotResult result = aGrid.attemptShot(nextShot);
             if (result.isHit) {
-                                // Transition to the sink algorithm, which will sink the ship and
+                // Transition to the sink algorithm, which will sink the ship and
                 // then we can resume the search algorithm
                 //System.out.println("STARTING SINK STRATEGY");
                 boolean sinkResult = shootToSink(aGrid, nextShot, result.hitShipName);
@@ -124,13 +127,13 @@ public class BruteForceAttackStrategy extends AttackStrategy {
 
     private Point mostValuableNextShot()
     {
-        Map.Entry<Point,Integer> bestShot = null;
-        LinkedList<Map.Entry<Point,Integer>> candidateList = new LinkedList<>();
+        Map.Entry<Integer,Integer> bestShot = null;
+        LinkedList<Map.Entry<Integer,Integer>> candidateList = new LinkedList<>();
 
-        Iterator<Map.Entry<Point,Integer>> pntIter = cellValueMap.entrySet().iterator();
+        Iterator<Map.Entry<Integer,Integer>> pntIter = cellValueMap.entrySet().iterator();
         while(pntIter.hasNext())
         {
-            Map.Entry<Point,Integer> anEntry = pntIter.next();
+            Map.Entry<Integer,Integer> anEntry = pntIter.next();
             if((bestShot == null) || bestShot.getValue().intValue() < anEntry.getValue())
             {
                 // If we have a new best value, clear the list and add the new entry
@@ -149,12 +152,24 @@ public class BruteForceAttackStrategy extends AttackStrategy {
         pntIter = candidateList.iterator();
         while(pntIter.hasNext())
         {
-            Map.Entry<Point,Integer> anEntry = pntIter.next();
+            Map.Entry<Integer,Integer> anEntry = pntIter.next();
             //System.out.println("Best Available (" + anEntry.getKey().x + "," + anEntry.getKey().y + ") = " + anEntry.getValue());
         }
 
         // For now, just return the first one until we can get the basic flow working
-        return candidateList.getFirst().getKey();
+        int combined = candidateList.getFirst().getKey();
+        int xValue = (combined & 0x00FF);
+        int yValue = ((combined & 0xFF00) >> 8);
+        return GameFactory.newPoint(xValue, yValue);
+    }
+
+    private void updateValueMap(Point aPoint, int value)
+    {
+        // Convert the point into binary and stuff it into an integer.  This should eliminate
+        // any need for the value map to use the heap when doing its operations.  Upper word
+        // is the y coordinate and lower word is the x coordinate
+        int combined = (aPoint.x | (aPoint.y << 8));
+        cellValueMap.put(combined, value);
     }
 
 }

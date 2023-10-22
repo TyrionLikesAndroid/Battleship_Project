@@ -50,7 +50,7 @@ public class GameFactory {
             bGridVector.add(i,aGrid);
         }
 
-        for(int i = 0; i < 4000000; i++)
+        for(int i = 0; i < 2000000; i++)
         {
             aPoint = new Point();
             pntVector.add(i,aPoint);
@@ -103,7 +103,7 @@ public class GameFactory {
     static BattleGrid createGrid()
     {
         bGridCounter++;
-        System.out.println("createGrid:" + bGridCounter);
+        //System.out.println("createGrid:" + bGridCounter);
         return bGridVector.get(bGridCounter);
     }
 
@@ -111,7 +111,7 @@ public class GameFactory {
     {
         Point out;
         pntCounter++;
-        System.out.println("newPoint:" + pntCounter);
+        //System.out.println("newPoint:" + pntCounter);
 
         out = pntVector.get(pntCounter);
         out.setLocation(x,y);
@@ -122,7 +122,7 @@ public class GameFactory {
     {
         Point out;
         pntCounter++;
-        System.out.println("newPoint2:" + pntCounter);
+        //System.out.println("newPoint2:" + pntCounter);
 
         out = pntVector.get(pntCounter);
         out.setLocation(aPoint.x, aPoint.y);
