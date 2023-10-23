@@ -36,9 +36,17 @@ public abstract class AttackStrategy {
 
     private boolean finishTargetShip(BattleGrid aGrid, Point currentHit, Point firstHit, String targetShip, String orientation, String shipOrientation) {
 
+        // Calculate the next attack based on the desired orientation
         Point newAttack = calculateNextAttack(currentHit, orientation);
+
+        // Take the shot
         ShotResult result = aGrid.attemptShot(newAttack);
+
+        // Notify the subclass that a shot was taken.  Depending on the strategy in place, they may be monitoring shots
+        sinkStrategyShot(newAttack, aGrid);
+
         if (result.isHit) {
+
             // We got another hit.  Verify that we hit the same ship or a different ship
             if (result.hitShipName.equals(targetShip)) {
                 // If we didn't sink it, keep shooting
@@ -131,6 +139,11 @@ public abstract class AttackStrategy {
             out = NO_MOVE_AVAILABLE;
 
         return out;
+    }
+
+    protected void sinkStrategyShot(Point aPoint, BattleGrid aGrid)
+    {
+        //System.out.println("Base Shot Notify (" + aPoint.x + "," + aPoint.y + ")");
     }
 
 }

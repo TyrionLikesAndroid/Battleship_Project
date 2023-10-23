@@ -1,9 +1,6 @@
 
 import java.awt.*;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 
@@ -12,6 +9,14 @@ public class BruteForceAttackStrategy extends AttackStrategy {
 
     HashMap<Integer,Integer> cellValueMap;
     Point recyclePnt;
+
+    class EntryCompare implements Comparator<Map.Entry<Integer,Integer>> {
+
+        public int compare(Map.Entry<Integer,Integer> a, Map.Entry<Integer,Integer> b)
+        {
+            return (b.getKey() - a.getKey());
+        }
+    }
 
     public BruteForceAttackStrategy(String name) {
 
@@ -56,37 +61,15 @@ public class BruteForceAttackStrategy extends AttackStrategy {
             {
                 // Every subsequent time through the loop, just update the rows that are now "dirty"
                 // due to the last shot that was placed
-                yValue = nextShot.y;
-                xValue = nextShot.x;
-
-                for(int i = 1; i <= xMax; i++)
-                {
-                    // Only update the cells in the horizontal row. Skip any cells that have already been shot
-                    recyclePnt.setLocation(i, yValue);
-                    if (!aGrid.quickShotLookup.contains(recyclePnt)) {
-                        cellValue = calculateCellValue(recyclePnt, aGrid);
-                        updateValueMap(recyclePnt,cellValue);
-                    }
-                }
-
-                for(int j = 1; j <= yMax; j++)
-                {
-                    // Only update the cells in the horizontal row.  Skip any cells that have already been shot
-                    recyclePnt.setLocation(xValue, j);
-                    if (!aGrid.quickShotLookup.contains(recyclePnt)) {
-                        cellValue = calculateCellValue(recyclePnt, aGrid);
-                        updateValueMap(recyclePnt,cellValue);
-                    }
-                }
+                recalculateDirtyData(nextShot,aGrid);
             }
 
             // Find the most valuable shot now that all the cells have been updated and attempt
             // a shot at that location
-            nextShot = mostValuableNextShot();
+            nextShot = mostValuableNextShot(aGrid);
             //System.out.println("Next Shot (" + nextShot.x + "," + nextShot.y + ")");
 
-
-            // After we select the best ell, assign the cell a value of zero so it won't
+            // After we select the best cell, assign the cell a value of zero so it won't
             // be considered in the next iteration.
             updateValueMap(nextShot,0);
 
@@ -125,7 +108,7 @@ public class BruteForceAttackStrategy extends AttackStrategy {
         return out;
     }
 
-    private Point mostValuableNextShot()
+    private Point mostValuableNextShot(BattleGrid aGrid)
     {
         Map.Entry<Integer,Integer> bestShot = null;
         LinkedList<Map.Entry<Integer,Integer>> candidateList = new LinkedList<>();
@@ -148,18 +131,55 @@ public class BruteForceAttackStrategy extends AttackStrategy {
             }
         }
 
-        // We should now have a list of the most valuable cells
-        pntIter = candidateList.iterator();
-        while(pntIter.hasNext())
+        // If shot history is empty, just return the first member of the candidate list because we have
+        // to start somewhere for the rest of the algorithm to work
+        int shiftedKey = 0;
+        if(aGrid.quickShotLookup.isEmpty())
+            shiftedKey = candidateList.getFirst().getKey();
+        else
         {
-            Map.Entry<Integer,Integer> anEntry = pntIter.next();
-            //System.out.println("Best Available (" + anEntry.getKey().x + "," + anEntry.getKey().y + ") = " + anEntry.getValue());
+            // Determine which point in our candidate list is the farthest from all of the points in
+            // the shot history.  This is going to be a terrible part of the algorithm from a performance
+            // point of view, but its a much better spacial approach to breaking ties other than just
+            // choosing the first item in the list of tied candidates
+
+            // Make a priority queue to put the results in.  This will automatically sort based on distance
+            PriorityQueue<AbstractMap.SimpleEntry<Integer,Integer>> distances = new PriorityQueue<>(new BruteForceAttackStrategy.EntryCompare());
+
+            // Iterate through our candidate cell list
+            pntIter = candidateList.iterator();
+            while(pntIter.hasNext())
+            {
+                int shortestRun = 10000;  // Choose a number that is bigger than all grid dimensions
+                Map.Entry<Integer,Integer> anEntry = pntIter.next();
+                recyclePnt.setLocation((anEntry.getKey() & 0x00FF),((anEntry.getKey() & 0xFF00) >> 8));
+
+                // Calculate the distance of every run from this shot to a previous shot.  We want to choose
+                // the point with the longest, shortest run.  This is the farthest point from the pack.
+                Iterator<Point> shotIter = aGrid.quickShotLookup.iterator();
+                while(shotIter.hasNext())
+                {
+                    Point shotPoint = shotIter.next();
+                    int shotDistance = calculateRelativePointDistance(recyclePnt, shotPoint);
+                    if(shortestRun > shotDistance)
+                        shortestRun = shotDistance;
+                }
+
+                // Add the point into the distance list with the total distance.  We don't need to calculate
+                // the average because that is the same denominator for all points being compared
+                distances.add(new AbstractMap.SimpleEntry<>(shortestRun,anEntry.getKey()));
+            }
+
+            // After going through the whole list, the longest average distance should be sorted to the top
+            shiftedKey = distances.poll().getValue();
         }
 
-        // For now, just return the first one until we can get the basic flow working
-        int combined = candidateList.getFirst().getKey();
-        int xValue = (combined & 0x00FF);
-        int yValue = ((combined & 0xFF00) >> 8);
+        // Convert the shifted key back into a point and return it
+        int xValue = (shiftedKey & 0x00FF);
+        int yValue = ((shiftedKey & 0xFF00) >> 8);
+
+        //System.out.println("Best Available (" + xValue + "," + yValue + ") = " + candidateList.getFirst().getValue());
+
         return GameFactory.newPoint(xValue, yValue);
     }
 
@@ -170,6 +190,53 @@ public class BruteForceAttackStrategy extends AttackStrategy {
         // is the y coordinate and lower word is the x coordinate
         int combined = (aPoint.x | (aPoint.y << 8));
         cellValueMap.put(combined, value);
+    }
+
+    private int calculateRelativePointDistance(Point a, Point b)
+    {
+        // We only need relative distances, so don't worry about taking the square
+        // root for the actual distance.  This will save performance time.
+        double xDiff = a.x - b.x;
+        double yDiff = a.y - b.y;
+        return (int) (Math.pow(xDiff,2) + Math.pow(yDiff,2));
+    }
+
+    protected void sinkStrategyShot(Point aPoint, BattleGrid aGrid)
+    {
+        super.sinkStrategyShot(aPoint, aGrid);
+        //System.out.println("Child Shot Notify (" + aPoint.x + "," + aPoint.y + ")");
+
+        updateValueMap(aPoint,0);
+        recalculateDirtyData(aPoint, aGrid);
+    }
+
+    private void recalculateDirtyData(Point aPoint, BattleGrid aGrid)
+    {
+        // Every subsequent time through the loop, just update the rows that are now "dirty"
+        // due to the last shot that was placed
+        int yValue = aPoint.y;
+        int xValue = aPoint.x;
+        int cellValue = 0;
+
+        for(int i = 1; i <= aGrid.width; i++)
+        {
+            // Only update the cells in the horizontal row. Skip any cells that have already been shot
+            recyclePnt.setLocation(i, yValue);
+            if (!aGrid.quickShotLookup.contains(recyclePnt)) {
+                cellValue = calculateCellValue(recyclePnt, aGrid);
+                updateValueMap(recyclePnt,cellValue);
+            }
+        }
+
+        for(int j = 1; j <= aGrid.length; j++)
+        {
+            // Only update the cells in the horizontal row.  Skip any cells that have already been shot
+            recyclePnt.setLocation(xValue, j);
+            if (!aGrid.quickShotLookup.contains(recyclePnt)) {
+                cellValue = calculateCellValue(recyclePnt, aGrid);
+                updateValueMap(recyclePnt,cellValue);
+            }
+        }
     }
 
 }
