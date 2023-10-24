@@ -107,7 +107,7 @@ public class GameFactory {
         return bGridVector.get(bGridCounter);
     }
 
-    static Point newPoint(int x, int y)
+    static synchronized Point newPoint(int x, int y)
     {
         Point out;
         pntCounter++;

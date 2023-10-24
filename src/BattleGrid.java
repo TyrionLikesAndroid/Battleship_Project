@@ -66,7 +66,7 @@ public class BattleGrid {
         return true;
     }
 
-    public ShotResult attemptShot(Point aPoint) {
+    public synchronized ShotResult attemptShot(Point aPoint) {
 
         if(startTime == 0) {
 

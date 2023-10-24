@@ -1,4 +1,7 @@
 import java.awt.*;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.PriorityQueue;
 import java.util.TreeMap;
 
 public abstract class AttackStrategy {
@@ -32,6 +35,81 @@ public abstract class AttackStrategy {
 
         // Start shooting in that direction
         return finishTargetShip(aGrid, firstHit, firstHit, targetShip, bestDirection, UNKNOWN);
+    }
+
+    protected boolean shootToSink(BattleGrid aGrid, PriorityQueue<Point> pointList, String targetShip)
+    {
+        // This is the list version of shootToSink which is only used by the DnC algorithm.  If we have
+        // a list with only one point, just throw it to the old algorithm that is built to handle the first hit.
+        if(pointList.size() == 1)
+            return shootToSink(aGrid, pointList.poll(),targetShip);
+
+        // If we get here, the particular ship has more than one hits on it already.  Let's first hit the points
+        // in the gaps because we know that they will be hits.  We know we will have at least two points, and
+        // possibly a third if this is the carrier.
+        Point firstHit = pointList.poll();
+        Point secondHit = pointList.poll();
+        Point thirdHit = pointList.poll();
+
+        // See if this is horizontal or vertical alignment
+        ShotResult hitResult;
+        boolean isHorizontal = (firstHit.y - secondHit.y) == 0;
+        if(isHorizontal)
+            hitResult = aGrid.attemptShot(GameFactory.newPoint((firstHit.x + 1), firstHit.y));
+        else
+            hitResult = aGrid.attemptShot(GameFactory.newPoint(firstHit.x, (firstHit.y + 1)));
+
+        // See if the ship is sunk, if so then exit
+        if(hitResult.hitShipStatus.equals(Ship.SUNK))
+            return true;
+
+        // Ship is not sunk, so see if we have a second gap to hit
+        Point lastHit = secondHit;
+        if(thirdHit != null)
+        {
+            lastHit = thirdHit;
+            if(isHorizontal)
+                hitResult = aGrid.attemptShot(GameFactory.newPoint((secondHit.x + 1), secondHit.y));
+            else
+                hitResult = aGrid.attemptShot(GameFactory.newPoint(secondHit.x, (secondHit.y + 1)));
+
+            // See if the ship is sunk, if so then exit
+            if(hitResult.hitShipStatus.equals(Ship.SUNK))
+                return true;
+        }
+
+        // If ship is still not sunk, we need to shoot at either end of the line for one more hit.  See if
+        // either of the ends are blocked, because that will make the decision easy and we shoot the other
+        String direction1 = determineBestDirection(aGrid, firstHit, isHorizontal ? HORIZONTAL : VERTICAL);
+        String direction2 = determineBestDirection(aGrid, lastHit, isHorizontal ? HORIZONTAL : VERTICAL);
+
+        if(direction1.equals(NO_MOVE_AVAILABLE))
+            return finishTargetShip(aGrid, lastHit, lastHit, targetShip, direction2, isHorizontal ? HORIZONTAL : VERTICAL);
+
+        if(direction2.equals(NO_MOVE_AVAILABLE))
+            return finishTargetShip(aGrid, firstHit, firstHit, targetShip, direction1, isHorizontal ? HORIZONTAL : VERTICAL);
+
+        // Both ends of the ship are viable, so we just need to guess.  At most we will miss once.
+        if(isHorizontal)
+            hitResult = aGrid.attemptShot(GameFactory.newPoint((firstHit.x - 1), firstHit.y));
+        else
+            hitResult = aGrid.attemptShot(GameFactory.newPoint(firstHit.x, (firstHit.y - 1)));
+
+        // See if the ship is sunk, if so then exit
+        if(hitResult.hitShipStatus.equals(Ship.SUNK))
+            return true;
+
+        // If we are here, we missed, so try the other one.
+        if(isHorizontal)
+            hitResult = aGrid.attemptShot(GameFactory.newPoint((lastHit.x + 1), lastHit.y));
+        else
+            hitResult = aGrid.attemptShot(GameFactory.newPoint(lastHit.x, (lastHit.y + 1)));
+
+        // See if the ship is sunk, if so then exit
+        if(hitResult.hitShipStatus.equals(Ship.SUNK))
+            return true;
+
+        return true;
     }
 
     private boolean finishTargetShip(BattleGrid aGrid, Point currentHit, Point firstHit, String targetShip, String orientation, String shipOrientation) {

@@ -7,10 +7,11 @@ public class Main {
         GameFactory.initialize(10,10);
 
         LinkedList<AttackStrategy> aList = new LinkedList<>();
-        aList.add(new SimpleAttackStrategy("Consecutive_Linear_1", 1));
-        aList.add(new SimpleAttackStrategy("Consecutive_Linear_2", 2));
+        aList.add(new SimpleAttackStrategy("Consecutive", 1));
+        aList.add(new SimpleAttackStrategy("Skip Cell", 2));
         aList.add(new BruteForceAttackStrategy("Brute Force"));
         aList.add(new RandomAttackStrategy("Random"));
+        aList.add(new DivideAndConquerStrategy("Divide N Conquer"));
 
         SimulationManager mgr = new SimulationManager(new RandomPlacementStrategy(), aList);
 
