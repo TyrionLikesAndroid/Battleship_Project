@@ -37,6 +37,9 @@ public class BruteForceAttackStrategy extends AttackStrategy {
         int cellValue = 0;
         Point nextShot = null;
 
+        // Start the clock before we get in the run loop and start doing math
+        aGrid.startTime = System.nanoTime();
+
         // Make a run loop that will go forever.  The break condition will be game over
         while(true)
         {

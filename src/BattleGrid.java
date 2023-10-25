@@ -233,8 +233,9 @@ public class BattleGrid {
     public long getDuration() {
 
         // This is in nanoseconds.  If we use the millesecond clock it will just be zero, so divide the
-        // back to milliseconds in the spreadsheet
-        return (endTime - startTime);
+        // back to milliseconds in the spreadsheet.  Sometimes its negative, just send it to 1
+        long duration = endTime - startTime;
+        return (duration > 0) ? duration : 1;
     }
 
     private void recordShot(Point aPoint) {
