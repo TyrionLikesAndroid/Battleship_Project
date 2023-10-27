@@ -44,19 +44,19 @@ public class GameFactory {
         cruiserVector = new Vector<>();
         destVector = new Vector<>();
 
-        for(int i = 0; i < 7000; i++)
+        for(int i = 0; i < 7500; i++)
         {
             aGrid = new BattleGrid(length,width);
             bGridVector.add(i,aGrid);
         }
 
-        for(int i = 0; i < 2000000; i++)
+        for(int i = 0; i < 22000000; i++)
         {
             aPoint = new Point();
             pntVector.add(i,aPoint);
         }
 
-        for(int i = 0; i < 6000; i++)
+        for(int i = 0; i < 5500; i++)
         {
             aShip = new Ship(BATTLESHIP, "B", BAT_LENGTH);
             bshipVector.add(i,aShip);
